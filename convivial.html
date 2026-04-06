@@ -1,0 +1,315 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SproutSpace Pro - Your Digital Garden</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="convivial.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+</head>
+<body class="bg-green-50 font-sans text-gray-800 min-h-screen">
+
+   <div id="loginOverlay" class="fixed inset-0 bg-green-900/40 backdrop-blur-md flex items-center justify-center z-[100] transition-all duration-500 p-4">
+    <div class="login-card w-full max-w-md bg-white/90 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl border border-white/50 relative overflow-hidden">
+        
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-green-200/50 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-yellow-200/50 rounded-full blur-3xl"></div>
+
+        <div id="loginContainer" class="form-section">
+            <div class="text-center mb-8">
+                <span class="text-6xl drop-shadow-lg">🌿</span>
+                <h2 class="text-4xl font-black text-green-800 mt-4 tracking-tight">SproutSpace</h2>
+                <p class="text-gray-500 font-medium italic mt-1">Welcome back, Gardener!</p>
+            </div>
+            
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <div class="group">
+                    <label class="text-[10px] font-black uppercase text-green-600 ml-2 mb-1 block">Email Address</label>
+                    <input type="email" placeholder="hello@garden.com" class="login-input w-full p-4 bg-gray-100/50 border-2 border-transparent rounded-2xl focus:border-green-500 focus:bg-white transition-all outline-none" required>
+                </div>
+                <div class="group">
+                    <label class="text-[10px] font-black uppercase text-green-600 ml-2 mb-1 block">Password</label>
+                    <input type="password" placeholder="••••••••" class="login-input w-full p-4 bg-gray-100/50 border-2 border-transparent rounded-2xl focus:border-green-500 focus:bg-white transition-all outline-none" required>
+                </div>
+                <button type="submit" class="login-submit-btn w-full py-4 rounded-2xl text-white font-black text-lg shadow-lg hover:scale-[1.02] active:scale-95 transition-all">
+                    Enter Your Garden 🚀
+                </button>
+            </form>
+            <p class="text-center text-sm text-gray-500 mt-8">
+                New to the soil? <a href="#" onclick="toggleAuth()" class="text-green-600 font-black hover:underline">Create Account</a>
+            </p>
+        </div>
+
+        <div id="signupContainer" class="form-section hidden opacity-0 translate-x-8">
+            <div class="text-center mb-8">
+                <span class="text-6xl drop-shadow-lg">🌱</span>
+                <h2 class="text-4xl font-black text-green-800 mt-4 tracking-tight">Join Sprout</h2>
+                <p class="text-gray-500 font-medium italic mt-1">Start your green journey!</p>
+            </div>
+            
+            <form onsubmit="handleSignup(event)" class="space-y-4">
+                <div id="signupError" class="hidden text-red-500 text-xs font-bold bg-red-50 p-3 rounded-xl text-center border border-red-100"></div>
+                <input type="text" id="regName" placeholder="Full Name" class="login-input w-full p-4 bg-gray-100/50 border-2 border-transparent rounded-2xl focus:border-green-500 outline-none" required>
+                <input type="email" id="regEmail" placeholder="Email Address" class="login-input w-full p-4 bg-gray-100/50 border-2 border-transparent rounded-2xl focus:border-green-500 outline-none" required>
+                <input type="password" id="regPass" placeholder="Create Password" class="login-input w-full p-4 bg-gray-100/50 border-2 border-transparent rounded-2xl focus:border-green-500 outline-none" required>
+                <input type="password" id="regConfirm" placeholder="Confirm Password" class="login-input w-full p-4 bg-gray-100/50 border-2 border-transparent rounded-2xl focus:border-green-500 outline-none" required>
+                
+                <button type="submit" class="login-submit-btn w-full py-4 rounded-2xl text-white font-black text-lg shadow-lg hover:scale-[1.02] transition-all">
+                    Start Planting 🌱
+                </button>
+            </form>
+            <p class="text-center text-sm text-gray-500 mt-8">
+                Already a member? <a href="#" onclick="toggleAuth()" class="text-green-600 font-black hover:underline">Log In</a>
+            </p>
+        </div>
+
+    </div>
+</div>
+
+    <div id="appContent" class="hidden">
+        <nav class="bg-white border-b border-green-100 p-4 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+        <h1 class="text-2xl font-black text-green-700 flex items-center gap-2 cursor-pointer" onclick="openTab('home')">
+            <span>🌿</span> SproutSpace
+        </h1>
+
+        <div class="flex items-center gap-4 w-full md:w-auto">
+
+    <!-- NAV BUTTONS -->
+    <div class="flex bg-green-50 p-1 rounded-xl">
+        <button onclick="openTab('home')" class="nav-btn px-4 py-2 rounded-lg font-bold text-sm text-green-700 bg-white shadow-sm">Dashboard</button>
+        <button onclick="openTab('guide')" class="nav-btn px-4 py-2 rounded-lg font-bold text-sm text-gray-500 hover:text-green-600">Learning Center</button>
+        <button onclick="openTab('journal')" class="nav-btn px-4 py-2 rounded-lg font-bold text-sm text-gray-500 hover:text-green-600">Growth Journal</button>
+    </div>
+
+    <!-- PROFILE ICON -->
+    <div class="relative">
+        <div onclick="toggleProfileMenu()" class="cursor-pointer text-xl bg-green-100 px-3 py-2 rounded-full hover:bg-green-200">
+            👤
+        </div>
+
+        <!-- DROPDOWN MENU -->
+        <div id="profileMenu" class="hidden absolute right-0 mt-2 w-44 bg-white border rounded-xl shadow-lg p-2 z-50">
+            <button onclick="deletePlantById()" class="w-full text-left px-3 py-2 hover:bg-red-100 rounded-lg text-red-600 font-bold">
+                🗑 Delete Plant
+            </button>
+
+            <button onclick="handleLogout()" class="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-lg text-gray-700 font-bold">
+                ➜] Logout
+            </button>
+        </div>
+    </div>
+
+</div>
+    </div>
+    <button onclick="toggleDarkMode()" class="px-3 py-2 bg-gray-200 rounded-xl">
+    🌙
+    </button>
+</nav>
+
+        <main class="max-w-6xl mx-auto p-4 md:p-8">
+            
+            <div id="home" class="tab-content active space-y-8">
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2 bg-gradient-to-r from-green-600 to-green-500 p-8 rounded-3xl text-white shadow-lg relative overflow-hidden">
+                        <h2 class="text-3xl font-bold mb-2" id="greetingText">Good Morning!</h2>
+                        <p class="opacity-90 mb-4" id="smartTip">"Plants love consistency."</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-3xl border border-green-100 shadow-sm flex flex-col justify-center text-center">
+                        <span class="text-4xl mb-2">🌦️</span>
+                        <h3 class="font-bold text-gray-800">Local Climate</h3>
+                        <p class="text-sm text-gray-500 italic">India Standard</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-2xl border border-gray-100">
+                    <div class="relative w-full md:w-96">
+                        <span class="absolute left-3 top-3 opacity-40">🔍</span>
+                        <input type="text" id="plantSearch" onkeyup="filterPlants()" placeholder="Search collection..." class="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-green-400 outline-none">
+                    </div>
+                    <button onclick="toggleModal('addPlantModal')" class="w-full md:w-auto bg-green-600 text-white px-6 py-2 rounded-xl font-bold shadow-lg hover:bg-green-700 transition">
+                        + Add Plant
+                    </button>
+                </div>
+
+                <div id="plantGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+            </div>
+
+            <div id="guide" class="tab-content space-y-8">
+
+    <header class="text-center">
+        <h2 class="text-3xl font-black text-green-800">🌱 Balcony Gardening Guide</h2>
+        <p class="text-gray-500 mt-2">Learn how to grow plants step-by-step</p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- HOW TO PLANT -->
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-green-100">
+            <h3 class="font-bold text-xl mb-3 text-green-700">🪴 How to Plant a Plant</h3>
+            <ul class="text-sm text-gray-600 space-y-2">
+                <li>1. Choose a suitable pot with drainage holes</li>
+                <li>2. Add soil mix (garden soil + compost)</li>
+                <li>3. Place the seed or plant gently</li>
+                <li>4. Cover roots with soil</li>
+                <li>5. Water lightly</li>
+                <li>6. Keep in sunlight</li>
+            </ul>
+        </div>
+
+        <!-- WATERING GUIDE -->
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-green-100">
+            <h3 class="font-bold text-xl mb-3 text-blue-700">💧 Watering Guide</h3>
+            <ul class="text-sm text-gray-600 space-y-2">
+                <li>• Water in morning or evening</li>
+                <li>• Do not overwater plants</li>
+                <li>• Check soil before watering</li>
+                <li>• Use clean water</li>
+            </ul>
+        </div>
+
+        <!-- SUNLIGHT GUIDE -->
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-green-100">
+            <h3 class="font-bold text-xl mb-3 text-yellow-600">☀️ Sunlight Tips</h3>
+            <ul class="text-sm text-gray-600 space-y-2">
+                <li>• Most plants need 4–6 hours sunlight</li>
+                <li>• Keep indoor plants near windows</li>
+                <li>• Avoid strong afternoon sun</li>
+            </ul>
+        </div>
+
+        <!-- BEST PLANTS -->
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-green-100">
+            <h3 class="font-bold text-xl mb-3 text-green-600">🌿 Best Balcony Plants</h3>
+            <ul class="text-sm text-gray-600 space-y-2">
+                <li>• Tulsi</li>
+                <li>• Mint</li>
+                <li>• Aloe Vera</li>
+                <li>• Tomato</li>
+                <li>• Coriander</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <!-- EXTRA PRO TIP SECTION -->
+    <div class="bg-green-100 p-6 rounded-3xl text-center shadow-inner">
+        <h3 class="font-bold text-lg text-green-800">🌟 Pro Tip</h3>
+        <p class="text-sm text-green-700 mt-2">
+            Always check soil moisture before watering. Overwatering is the most common mistake!
+        </p>
+    </div>
+<div class="bg-green-100 p-6 rounded-3xl text-center shadow-inner">
+
+    <h3 class="font-bold text-lg text-green-800">🤖 Smart Suggestion</h3>
+    
+    <p id="aiSuggestion" class="text-sm text-green-700 mt-2">
+        Click below to get plant suggestions
+    </p>
+
+    <button onclick="generateSuggestion()" 
+        class="mt-3 bg-green-600 text-white px-4 py-2 rounded-xl font-bold">
+        Get Suggestion
+    </button>
+
+        </div>
+        </div>
+
+           <div id="journal" class="tab-content max-w-2xl mx-auto space-y-6">
+
+    <!-- SEARCH -->
+    <input type="text" id="journalSearch" onkeyup="searchJournal()" 
+    placeholder="Search entries..." 
+    class="w-full p-3 bg-gray-50 rounded-xl">
+
+    <!-- ENTRY FORM -->
+    <div class="bg-white p-6 rounded-3xl shadow-sm border">
+
+        <h3 class="font-black text-xl mb-4 text-green-800">Write an Entry 📝</h3>
+
+        <!-- SELECT PLANT -->
+        <select id="journalPlant" class="w-full p-3 bg-gray-50 rounded-xl mb-3">
+            <option value="">Select Plant</option>
+        </select>
+
+        <!-- MOOD -->
+        <select id="journalMood" class="w-full p-3 bg-gray-50 rounded-xl mb-3">
+            <option value="🌱 Healthy">🌱 Healthy</option>
+            <option value="💧 Watered">💧 Watered</option>
+            <option value="🌼 Blooming">🌼 Blooming</option>
+            <option value="⚠️ Issue">⚠️ Issue</option>
+        </select>
+
+        <!-- TEXT -->
+        <textarea id="journalInput" 
+        class="w-full p-4 bg-gray-50 rounded-xl h-32 mb-3"></textarea>
+
+        <!-- IMAGE -->
+        <input type="file" id="journalImage" accept="image/*" class="mb-3">
+
+        <!-- BUTTON -->
+        <button onclick="addJournalEntry()" 
+        class="w-full bg-green-600 text-white py-3 rounded-xl font-bold">
+            Log Progress
+        </button>
+        
+    </div>
+
+    <!-- ENTRIES -->
+    <div id="journalEntries" class="space-y-4"></div>
+
+    <!-- GRAPH -->
+    <canvas id="growthChart" class="mt-6"></canvas>
+    <button onclick="exportPDF()" class="bg-blue-600 text-white px-4 py-2 rounded-xl">
+    Export PDF 📄
+    </button>
+
+</div>
+        </main>
+    </div>
+
+    <div id="addPlantModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-[200]">
+        <div class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl">
+            <h3 class="text-2xl font-black mb-6">New Plant</h3>
+            <div class="space-y-4">
+                <input type="text" id="newPlantName" placeholder="Name" class="w-full p-3 bg-gray-50 rounded-xl outline-none focus:ring-2 focus:ring-green-400 border-none">
+                <select id="newPlantStatus" class="w-full p-3 bg-gray-50 rounded-xl outline-none border-none">
+                    <option value="healthy">Healthy 🟢</option>
+                    <option value="thirsty">Needs Water 🟡</option>
+                </select>
+                <button onclick="savePlant()" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold">Save</button>
+                <button onclick="toggleModal('addPlantModal')" class="w-full text-gray-400 font-bold">Cancel</button>
+            </div>
+        </div>
+        <div class="space-y-1">
+    <label class="text-[10px] font-black uppercase text-green-600 ml-2">Plant Photo</label>
+    <input type="file" id="newPlantImage" accept="image/*" class="w-full p-3 bg-gray-50 rounded-xl outline-none text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100">
+</div>
+    </div>
+    <div id="deleteModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[300]">
+    <div class="bg-white p-6 rounded-2xl w-80 shadow-xl text-center">
+        
+        <h3 class="text-xl font-bold text-green-700 mb-2">🌿 SproutSpace</h3>
+        <p class="text-gray-600 mb-4">Enter Plant ID to delete</p>
+
+        <input type="number" id="deletePlantIdInput" placeholder="Plant ID"
+            class="w-full p-2 border rounded-lg mb-4 outline-none focus:ring-2 focus:ring-green-400">
+
+        <div class="flex gap-2">
+            <button onclick="confirmDelete()" class="w-full bg-red-500 text-white py-2 rounded-lg font-bold">
+                Delete
+            </button>
+            <button onclick="toggleDeleteModal()" class="w-full bg-gray-200 py-2 rounded-lg font-bold">
+                Cancel
+            </button>
+        </div>
+
+    </div>
+</div>
+
+    <script src="convivial.js"></script>
+</body>
+</html>
+   
