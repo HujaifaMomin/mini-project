@@ -1,8 +1,36 @@
 
 let myPlants = [
+    
     { id: 1, name: 'Money Plant', type: 'Climber', status: 'healthy', nextWater: '2 Days' },
-    { id: 2, name: 'Tulsi', type: 'Medicinal', status: 'thirsty', nextWater: 'Today' }
+    { id: 2, name: 'tulsi', type: 'Medicinal', status: 'thirsty', nextWater: 'Today' }
 ];
+const plantGuide = {
+    "Money Plant": {
+        advantages: [
+            "Improves air quality",
+            "Easy to grow",
+            "Good for indoor decoration"
+        ],
+        drawbacks: [
+            "Toxic to pets",
+            "Needs regular trimming"
+        ],
+        conditions: "Indirect sunlight, moderate watering"
+    },
+
+    "tulsi": {
+        advantages: [
+            "Medicinal properties",
+            "Repels insects",
+            "Good for health"
+        ],
+        drawbacks: [
+            "Needs daily sunlight",
+            "Sensitive to cold"
+        ],
+        conditions: "Direct sunlight, daily watering"
+    }
+};
 
 // Login Logic
 function handleLogin(e) {
@@ -87,8 +115,18 @@ function openTab(tabId) {
 }
 
 function openPlantPage(plantId) {
+    localStorage.setItem("currentPlantId", plantId);
     const plant = myPlants.find(p => p.id == plantId);
     if (!plant) return;
+   
+
+            // Get guide data
+            let guide = plantGuide[plant.name] || {
+                advantages: ["No data available"],
+                drawbacks: ["No data available"],
+                conditions: "Not specified"
+            };
+
 
     const journalContainer = document.getElementById('journalEntries');
     const relatedEntries = Array.from(journalContainer.children)
@@ -105,14 +143,63 @@ function openPlantPage(plantId) {
                 <p class="text-gray-500">Type: ${plant.type}</p>
                 <p class="text-gray-500">Status: ${plant.status}</p>
                 <p class="text-gray-500">Next Water: ${plant.nextWater}</p>
+                <p>Next Water: <span id="nextWaterText">${plant.nextWater}</span></p>
+
+         
+
+                <!-- WATER BUTTON -->
+                <button onclick="markWatered()" 
+                class="bg-blue-500 text-white px-4 py-2 rounded-lg mt-3">
+                💧 Mark as Watered
+                </button>
+
+                <!-- DELETE BUTTON -->
+                <button onclick="toggleCustomDeleteModal()" 
+                class="bg-red-500 text-white px-4 py-2 rounded-lg mt-3">
+                🗑 Delete Plant
+                </button>
             </div>
         </div>
         <h3 class="text-xl font-bold text-green-700 mb-2">Journal Entries</h3>
+
         <div class="space-y-4">
             ${relatedEntries.map(e => e.outerHTML).join('') || '<p class="text-gray-500">No entries yet.</p>'}
         </div>
     </div>
+    <div class="bg-white p-6 rounded-3xl shadow-sm">
+
+    <h3 class="text-xl font-bold text-green-700 mb-4">
+        🌿 Plant Insights
+    </h3>
+
+    <!-- ADVANTAGES -->
+    <div class="bg-green-50 p-4 rounded-xl mb-3">
+        <h4 class="font-bold text-green-700">✅ Advantages</h4>
+        <ul class="text-sm text-gray-600 mt-2">
+            ${guide.advantages.map(a => `<li>• ${a}</li>`).join("")}
+        </ul>
+    </div>
+
+    <!-- DRAWBACKS -->
+    <div class="bg-red-50 p-4 rounded-xl mb-3">
+        <h4 class="font-bold text-red-600">❌ Drawbacks</h4>
+        <ul class="text-sm text-gray-600 mt-2">
+            ${guide.drawbacks.map(d => `<li>• ${d}</li>`).join("")}
+        </ul>
+    </div>
+
+    <!-- CONDITIONS -->
+    <div class="bg-blue-50 p-4 rounded-xl">
+        <h4 class="font-bold text-blue-600">🌞 Best Conditions</h4>
+        <p class="text-sm text-gray-600 mt-2">
+            ${guide.conditions}
+        </p>
+    </div>
+
+</div>
     `;
+    
+    
 
     // Hide main app content and show plant detail
     const mainContent = document.querySelector('main');
@@ -122,6 +209,12 @@ function openPlantPage(plantId) {
     plantDetailContainer.id = 'plantDetailContainer';
     plantDetailContainer.innerHTML = content;
     document.getElementById('appContent').appendChild(plantDetailContainer);
+
+}
+
+// OPEN / CLOSE MODAL
+function toggleCustomDeleteModal() {
+    document.getElementById("customDeleteModal").classList.toggle("hidden");
 }
 
 function closePlantPage() {
@@ -564,4 +657,71 @@ function fixOldEntries() {
 
         entry.appendChild(actions);
     });
+}
+// water mark
+function markWatered() {
+    const plantId = localStorage.getItem("currentPlantId");
+
+    let plants = JSON.parse(localStorage.getItem("plants")) || [];
+    let plant = plants.find(p => p.id == plantId);
+
+    if (!plant) return;
+
+    // Update next watering (1–3 days random)
+    const days = Math.floor(Math.random() * 3) + 1;
+    plant.nextWater = days + " Days";
+
+    // Save to localStorage (IMPORTANT)
+    localStorage.setItem("plants", JSON.stringify(plants));
+
+    // Update UI
+    document.getElementById("nextWaterText").innerText = plant.nextWater;
+
+    showCustomAlert("💧 Plant watered!");
+}
+// delete curent plant
+function confirmDeletePlant() {
+    const plantId = localStorage.getItem("currentPlantId");
+
+    let plants = JSON.parse(localStorage.getItem("plants")) || [];
+
+    // Remove plant
+    plants = plants.filter(p => p.id != plantId);
+
+    // SAVE (important)
+    localStorage.setItem("plants", JSON.stringify(plants));
+
+    showCustomAlert("🗑 Plant deleted successfully!");
+
+    toggleCustomDeleteModal();
+    closePlantPage();
+    renderPlants(plants);
+}
+function submitSuggestion() {
+    const input = document.getElementById("suggestionInput");
+    const msg = document.getElementById("suggestionMsg");
+
+    if (!input.value.trim()) {
+        showCustomAlert("⚠️ Please write something!");
+        return;
+    }
+
+    // Save suggestion in localStorage
+    let suggestions = JSON.parse(localStorage.getItem("suggestions")) || [];
+    suggestions.push({
+        text: input.value,
+        date: new Date().toLocaleString()
+    });
+
+    localStorage.setItem("suggestions", JSON.stringify(suggestions));
+
+    // Clear input
+    input.value = "";
+
+    // Show success message
+    msg.classList.remove("hidden");
+
+    setTimeout(() => {
+        msg.classList.add("hidden");
+    }, 3000);
 }
